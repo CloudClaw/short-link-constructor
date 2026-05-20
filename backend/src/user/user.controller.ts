@@ -1,49 +1,33 @@
-import { Controller, Post, Body, Patch, Param, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Res, Get } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { UserCreateInputObjectZodSchema } from '../../prisma/generated/schemas';
+import { CreateUserDto, LoginUserDto } from './dto/create-user.dto';
+import type { Response } from 'express';
 
 @Controller('user')
 export class UserController {
-  constructor(
-    private readonly userService: UserService,
-    private readonly PrismaService: PrismaService,
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('create')
   @HttpCode(201)
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    const user = createUserDto;
-
-    try {
-      UserCreateInputObjectZodSchema.parse(user);
-
-      const newUser = await this.PrismaService.user.create({
-        data: user,
-      });
-
-      return newUser.id;
-    } catch (error) {
-      console.log(error);
-      if (error.name === 'ZodError') {
-        return {
-          statusCode: 400,
-          message: 'Validation failed',
-        };
-      }
-      if (error.name === 'PrismaClientKnownRequestError') {
-        return {
-          statusCode: 400,
-          message: 'User with this email already exists',
-        };
-      }
-    }
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.userService.create(createUserDto, res);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Post('login')
+  @HttpCode(201)
+  async loginUser(
+    @Body() loginUserDto: LoginUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.userService.login(loginUserDto, res);
+  }
+
+  @Post('logout')
+  @HttpCode(204)
+  logOutUser(@Res({ passthrough: true }) res: Response) {
+    return this.userService.logout(res);
   }
 }
