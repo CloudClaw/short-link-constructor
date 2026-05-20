@@ -9,6 +9,7 @@ export const UserGroupByResultSchema = z.array(z.object({
     id: z.number(),
     email: z.number(),
     password: z.number(),
+    shortLinks: z.number(),
     createdAt: z.number(),
     updatedAt: z.number()
   }).optional(),

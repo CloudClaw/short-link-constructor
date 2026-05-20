@@ -3,7 +3,8 @@ import type { Prisma } from '../../../../generated/prisma/client';
 
 
 const makeSchema = () => z.object({
-  id: z.literal(true).optional()
+  id: z.literal(true).optional(),
+  userId: z.literal(true).optional()
 }).strict();
 export const ShortLinkAvgAggregateInputObjectSchema: z.ZodType<Prisma.ShortLinkAvgAggregateInputType> = makeSchema() as unknown as z.ZodType<Prisma.ShortLinkAvgAggregateInputType>;
 export const ShortLinkAvgAggregateInputObjectZodSchema = makeSchema();

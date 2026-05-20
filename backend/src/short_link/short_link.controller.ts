@@ -1,25 +1,8 @@
-import {
-  Controller,
-  Get,
-  // Post,
-  Body,
-  Post,
-  HttpCode,
-  Res,
-  Req,
-  Next,
-  Param,
-  // Patch,
-  // Param,
-  // Delete,
-} from '@nestjs/common';
+import { Controller, Body, Post, HttpCode, Res, Get } from '@nestjs/common';
 import { ShortLinkService } from './short_link.service';
 import { CreateShortLinkDto } from './dto/create-short_link.dto';
-import type { IConstructorResponse } from './types';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import { PrismaService } from '../prisma/prisma.service';
-// import { CreateShortLinkDto } from './dto/create-short_link.dto';
-// import { UpdateShortLinkDto } from './dto/update-short_link.dto';
+import type { Response } from 'express';
 
 @Controller('short-link')
 export class ShortLinkController {
@@ -28,54 +11,21 @@ export class ShortLinkController {
     private readonly prismaService: PrismaService,
   ) {}
 
-  // @Post()
-  // create(@Body() createShortLinkDto: CreateShortLinkDto) {
-  //   return this.shortLinkService.create(createShortLinkDto);
-  // }
-
-  @Post()
+  @Post('create')
   @HttpCode(201)
-  async createShortUrl(@Body() createShortUrlDto: CreateShortLinkDto) {
-    try {
-      const shortUrl = await this.shortLinkService.getShortUrl(
-        createShortUrlDto.originalUrl,
-      );
-
-      const newShortUrl = await this.prismaService.shortLink.create({
-        data: {
-          originalLink: createShortUrlDto.originalUrl,
-          shortLink: shortUrl,
-        },
-      });
-
-      return {
-        id: newShortUrl.id,
-        originalUrl: newShortUrl.originalLink,
-        shortUrl: newShortUrl.shortLink,
-      };
-    } catch (error) {
-      console.log(error);
-      if (error instanceof PrismaClientKnownRequestError) {
-        console.log('Таблица не существует в данной базе');
-      }
-    }
+  async createShortUrl(
+    @Body() createShortUrlDto: CreateShortLinkDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.shortLinkService.createShortUrl(
+      createShortUrlDto.originalUrl,
+      res,
+    );
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.shortLinkService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateShortLinkDto: UpdateShortLinkDto,
-  // ) {
-  //   return this.shortLinkService.update(+id, updateShortLinkDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.shortLinkService.remove(+id);
-  // }
+  @Get('get-all')
+  @HttpCode(200)
+  async getAllShortLinks(@Res({ passthrough: true }) res: Response) {
+    return await this.shortLinkService.getAllShortLinks(res);
+  }
 }

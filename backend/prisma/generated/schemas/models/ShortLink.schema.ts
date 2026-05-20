@@ -4,6 +4,7 @@ export const ShortLinkSchema = z.object({
   id: z.number().int(),
   originalLink: z.string(),
   shortLink: z.string(),
+  userId: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

@@ -1,11 +1,12 @@
 import * as z from 'zod';
 import type { Prisma } from '../../../../generated/prisma/client';
-
+import { UserCreateNestedOneWithoutShortLinksInputObjectSchema as UserCreateNestedOneWithoutShortLinksInputObjectSchema } from './UserCreateNestedOneWithoutShortLinksInput.schema'
 
 const makeSchema = () => z.object({
   originalLink: z.string(),
   shortLink: z.string(),
-  createdAt: z.coerce.date().optional()
+  createdAt: z.coerce.date().optional(),
+  user: z.lazy(() => UserCreateNestedOneWithoutShortLinksInputObjectSchema)
 }).strict();
 export const ShortLinkCreateInputObjectSchema: z.ZodType<Prisma.ShortLinkCreateInput> = makeSchema() as unknown as z.ZodType<Prisma.ShortLinkCreateInput>;
 export const ShortLinkCreateInputObjectZodSchema = makeSchema();

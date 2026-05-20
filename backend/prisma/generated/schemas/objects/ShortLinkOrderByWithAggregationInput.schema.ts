@@ -11,6 +11,7 @@ const makeSchema = () => z.object({
   id: SortOrderSchema.optional(),
   originalLink: SortOrderSchema.optional(),
   shortLink: SortOrderSchema.optional(),
+  userId: SortOrderSchema.optional(),
   createdAt: SortOrderSchema.optional(),
   updatedAt: SortOrderSchema.optional(),
   _count: z.lazy(() => ShortLinkCountOrderByAggregateInputObjectSchema).optional(),

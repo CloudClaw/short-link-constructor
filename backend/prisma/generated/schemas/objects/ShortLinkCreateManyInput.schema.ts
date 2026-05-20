@@ -6,6 +6,7 @@ const makeSchema = () => z.object({
   id: z.number().int().optional(),
   originalLink: z.string(),
   shortLink: z.string(),
+  userId: z.number().int(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional()
 }).strict();

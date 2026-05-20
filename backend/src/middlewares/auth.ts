@@ -8,6 +8,8 @@ import { IAuthPayload } from '../user/types';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
+  constructor(private readonly jwtService: JwtService) {}
+
   use(req: Request, res: Response, next: NextFunction) {
     const { accessToken } = req.cookies;
 
@@ -15,15 +17,11 @@ export class AuthMiddleware implements NestMiddleware {
       return next(new NotAuthorizedError());
     }
 
-    const tokenSecret = process.env.JWT_SECRET as string;
-
     try {
-      const payload: IAuthPayload = new JwtService().verify(
+      const payload: IAuthPayload = this.jwtService.verify(
         accessToken as string,
-        {
-          secret: tokenSecret,
-        },
       );
+
       res.locals.user = payload;
       next();
     } catch {
