@@ -1,0 +1,15 @@
+import type { Prisma } from '../../../generated/prisma/client';
+import * as z from 'zod';
+import { ShortLinkWhereInputObjectSchema as ShortLinkWhereInputObjectSchema } from './objects/ShortLinkWhereInput.schema';
+import { ShortLinkOrderByWithAggregationInputObjectSchema as ShortLinkOrderByWithAggregationInputObjectSchema } from './objects/ShortLinkOrderByWithAggregationInput.schema';
+import { ShortLinkScalarWhereWithAggregatesInputObjectSchema as ShortLinkScalarWhereWithAggregatesInputObjectSchema } from './objects/ShortLinkScalarWhereWithAggregatesInput.schema';
+import { ShortLinkScalarFieldEnumSchema } from './enums/ShortLinkScalarFieldEnum.schema';
+import { ShortLinkCountAggregateInputObjectSchema as ShortLinkCountAggregateInputObjectSchema } from './objects/ShortLinkCountAggregateInput.schema';
+import { ShortLinkMinAggregateInputObjectSchema as ShortLinkMinAggregateInputObjectSchema } from './objects/ShortLinkMinAggregateInput.schema';
+import { ShortLinkMaxAggregateInputObjectSchema as ShortLinkMaxAggregateInputObjectSchema } from './objects/ShortLinkMaxAggregateInput.schema';
+import { ShortLinkAvgAggregateInputObjectSchema as ShortLinkAvgAggregateInputObjectSchema } from './objects/ShortLinkAvgAggregateInput.schema';
+import { ShortLinkSumAggregateInputObjectSchema as ShortLinkSumAggregateInputObjectSchema } from './objects/ShortLinkSumAggregateInput.schema';
+
+export const ShortLinkGroupBySchema: z.ZodType<Prisma.ShortLinkGroupByArgs> = z.object({ where: ShortLinkWhereInputObjectSchema.optional(), orderBy: z.union([ShortLinkOrderByWithAggregationInputObjectSchema, ShortLinkOrderByWithAggregationInputObjectSchema.array()]).optional(), having: ShortLinkScalarWhereWithAggregatesInputObjectSchema.optional(), take: z.number().optional(), skip: z.number().optional(), by: z.array(ShortLinkScalarFieldEnumSchema), _count: z.union([ z.literal(true), ShortLinkCountAggregateInputObjectSchema ]).optional(), _min: ShortLinkMinAggregateInputObjectSchema.optional(), _max: ShortLinkMaxAggregateInputObjectSchema.optional(), _avg: ShortLinkAvgAggregateInputObjectSchema.optional(), _sum: ShortLinkSumAggregateInputObjectSchema.optional() }).strict() as unknown as z.ZodType<Prisma.ShortLinkGroupByArgs>;
+
+export const ShortLinkGroupByZodSchema = z.object({ where: ShortLinkWhereInputObjectSchema.optional(), orderBy: z.union([ShortLinkOrderByWithAggregationInputObjectSchema, ShortLinkOrderByWithAggregationInputObjectSchema.array()]).optional(), having: ShortLinkScalarWhereWithAggregatesInputObjectSchema.optional(), take: z.number().optional(), skip: z.number().optional(), by: z.array(ShortLinkScalarFieldEnumSchema), _count: z.union([ z.literal(true), ShortLinkCountAggregateInputObjectSchema ]).optional(), _min: ShortLinkMinAggregateInputObjectSchema.optional(), _max: ShortLinkMaxAggregateInputObjectSchema.optional(), _avg: ShortLinkAvgAggregateInputObjectSchema.optional(), _sum: ShortLinkSumAggregateInputObjectSchema.optional() }).strict();

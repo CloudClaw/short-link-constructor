@@ -4,6 +4,34 @@ generator client {
   moduleFormat = "cjs"
 }
 
+generator zod {
+  provider = "prisma-zod-generator"
+}
+
 datasource db {
   provider = "postgresql"
+  schemas  = ["SHORT_LINK_CONSTRUCTOR"]
+}
+
+model ShortLink {
+  id           Int      @id @unique @default(autoincrement())
+  originalLink String
+  shortLink    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("short_link")
+  @@schema("SHORT_LINK_CONSTRUCTOR")
+}
+
+model User {
+  id       Int    @id @unique @default(autoincrement())
+  email    String @unique /// @zod.email()
+  password String /// @zod.string().min(6)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user")
+  @@schema("SHORT_LINK_CONSTRUCTOR")
 }

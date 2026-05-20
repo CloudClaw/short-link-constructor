@@ -1,0 +1,14 @@
+import type { Prisma } from '../../../generated/prisma/client';
+import * as z from 'zod';
+import { ShortLinkOrderByWithRelationInputObjectSchema as ShortLinkOrderByWithRelationInputObjectSchema } from './objects/ShortLinkOrderByWithRelationInput.schema';
+import { ShortLinkWhereInputObjectSchema as ShortLinkWhereInputObjectSchema } from './objects/ShortLinkWhereInput.schema';
+import { ShortLinkWhereUniqueInputObjectSchema as ShortLinkWhereUniqueInputObjectSchema } from './objects/ShortLinkWhereUniqueInput.schema';
+import { ShortLinkCountAggregateInputObjectSchema as ShortLinkCountAggregateInputObjectSchema } from './objects/ShortLinkCountAggregateInput.schema';
+import { ShortLinkMinAggregateInputObjectSchema as ShortLinkMinAggregateInputObjectSchema } from './objects/ShortLinkMinAggregateInput.schema';
+import { ShortLinkMaxAggregateInputObjectSchema as ShortLinkMaxAggregateInputObjectSchema } from './objects/ShortLinkMaxAggregateInput.schema';
+import { ShortLinkAvgAggregateInputObjectSchema as ShortLinkAvgAggregateInputObjectSchema } from './objects/ShortLinkAvgAggregateInput.schema';
+import { ShortLinkSumAggregateInputObjectSchema as ShortLinkSumAggregateInputObjectSchema } from './objects/ShortLinkSumAggregateInput.schema';
+
+export const ShortLinkAggregateSchema: z.ZodType<Prisma.ShortLinkAggregateArgs> = z.object({ orderBy: z.union([ShortLinkOrderByWithRelationInputObjectSchema, ShortLinkOrderByWithRelationInputObjectSchema.array()]).optional(), where: ShortLinkWhereInputObjectSchema.optional(), cursor: ShortLinkWhereUniqueInputObjectSchema.optional(), take: z.number().optional(), skip: z.number().optional(), _count: z.union([ z.literal(true), ShortLinkCountAggregateInputObjectSchema ]).optional(), _min: ShortLinkMinAggregateInputObjectSchema.optional(), _max: ShortLinkMaxAggregateInputObjectSchema.optional(), _avg: ShortLinkAvgAggregateInputObjectSchema.optional(), _sum: ShortLinkSumAggregateInputObjectSchema.optional() }).strict() as unknown as z.ZodType<Prisma.ShortLinkAggregateArgs>;
+
+export const ShortLinkAggregateZodSchema = z.object({ orderBy: z.union([ShortLinkOrderByWithRelationInputObjectSchema, ShortLinkOrderByWithRelationInputObjectSchema.array()]).optional(), where: ShortLinkWhereInputObjectSchema.optional(), cursor: ShortLinkWhereUniqueInputObjectSchema.optional(), take: z.number().optional(), skip: z.number().optional(), _count: z.union([ z.literal(true), ShortLinkCountAggregateInputObjectSchema ]).optional(), _min: ShortLinkMinAggregateInputObjectSchema.optional(), _max: ShortLinkMaxAggregateInputObjectSchema.optional(), _avg: ShortLinkAvgAggregateInputObjectSchema.optional(), _sum: ShortLinkSumAggregateInputObjectSchema.optional() }).strict();

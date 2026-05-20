@@ -16,12 +16,17 @@ import {
 import { ShortLinkService } from './short_link.service';
 import { CreateShortLinkDto } from './dto/create-short_link.dto';
 import type { IConstructorResponse } from './types';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import { PrismaService } from '../prisma/prisma.service';
 // import { CreateShortLinkDto } from './dto/create-short_link.dto';
 // import { UpdateShortLinkDto } from './dto/update-short_link.dto';
 
 @Controller('short-link')
 export class ShortLinkController {
-  constructor(private readonly shortLinkService: ShortLinkService) {}
+  constructor(
+    private readonly shortLinkService: ShortLinkService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   // @Post()
   // create(@Body() createShortLinkDto: CreateShortLinkDto) {
@@ -30,22 +35,29 @@ export class ShortLinkController {
 
   @Post()
   @HttpCode(201)
-  async createShortUrl(
-    @Body() createShortUrlDto: CreateShortLinkDto,
-    @Res({ passthrough: true }) res: IConstructorResponse,
-    @Next() next,
-  ) {
+  async createShortUrl(@Body() createShortUrlDto: CreateShortLinkDto) {
     try {
       const shortUrl = await this.shortLinkService.getShortUrl(
         createShortUrlDto.originalUrl,
       );
 
+      const newShortUrl = await this.prismaService.shortLink.create({
+        data: {
+          originalLink: createShortUrlDto.originalUrl,
+          shortLink: shortUrl,
+        },
+      });
+
       return {
-        originalUrl: createShortUrlDto.originalUrl,
-        shortUrl,
+        id: newShortUrl.id,
+        originalUrl: newShortUrl.originalLink,
+        shortUrl: newShortUrl.shortLink,
       };
     } catch (error) {
       console.log(error);
+      if (error instanceof PrismaClientKnownRequestError) {
+        console.log('Таблица не существует в данной базе');
+      }
     }
   }
 
