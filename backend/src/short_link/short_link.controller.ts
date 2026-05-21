@@ -1,15 +1,23 @@
-import { Controller, Body, Post, HttpCode, Res, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ShortLinkService } from './short_link.service';
 import { CreateShortLinkDto } from './dto/create-short_link.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { UpdateShortLinkDto } from './dto/update-short_link.dto';
 import type { Response } from 'express';
+import { IAuthPayload } from '../user/types';
 
 @Controller('short-link')
 export class ShortLinkController {
-  constructor(
-    private readonly shortLinkService: ShortLinkService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly shortLinkService: ShortLinkService) {}
 
   @Post('create')
   @HttpCode(201)
@@ -17,15 +25,54 @@ export class ShortLinkController {
     @Body() createShortUrlDto: CreateShortLinkDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.shortLinkService.createShortUrl(
+    const userId = this.getUserIdFromLocals(res);
+    return this.shortLinkService.createShortUrl(
       createShortUrlDto.originalUrl,
-      res,
+      userId,
     );
   }
 
   @Get('get-all')
   @HttpCode(200)
   async getAllShortLinks(@Res({ passthrough: true }) res: Response) {
-    return await this.shortLinkService.getAllShortLinks(res);
+    const userId = this.getUserIdFromLocals(res);
+    return this.shortLinkService.getAllShortLinks(userId);
+  }
+
+  @Post('update/:id')
+  @HttpCode(200)
+  async updateShortLink(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateShortLinkDto: UpdateShortLinkDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const userId = this.getUserIdFromLocals(res);
+    return this.shortLinkService.updateShortLink(
+      userId,
+      id,
+      updateShortLinkDto.originalUrl,
+    );
+  }
+
+  @Post('remove/:id')
+  @HttpCode(200)
+  async removeShortLink(
+    @Param('id', ParseIntPipe) id: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const userId = this.getUserIdFromLocals(res);
+    return this.shortLinkService.removeShortLink(
+      userId,
+      id,
+    );
+  }
+
+  private getUserIdFromLocals(res: Response) {
+    const payload = res.locals.user as IAuthPayload | undefined;
+    if (!payload?.userId) {
+      throw new UnauthorizedException('Requires authentication');
+    }
+
+    return payload.userId;
   }
 }

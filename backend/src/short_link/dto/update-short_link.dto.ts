@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsUrl } from 'class-validator';
 
-export class CreateShortLinkDto {
+export class UpdateShortLinkDto {
   @IsUrl()
   @IsNotEmpty()
   originalUrl!: string;

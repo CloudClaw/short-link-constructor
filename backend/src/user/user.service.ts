@@ -1,17 +1,17 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto, LoginUserDto } from './dto/create-user.dto';
-import { UserCreateInputObjectZodSchema } from '../../prisma/generated/schemas';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { ONE_HOUR } from './constants';
 import { compare, genSalt, hash } from 'bcrypt';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
+import NotAuthorizedError from '../errors/not-authorized-error';
 
 @Injectable()
 export class UserService {
@@ -21,16 +21,12 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto, res: Response) {
-    const user = createUserDto;
-
     try {
-      UserCreateInputObjectZodSchema.parse(user);
-
-      const isModifiedPassword = await this.passwordModifier(user.password);
+      const hashedPassword = await this.hashPassword(createUserDto.password);
 
       const updatedUser = {
-        ...user,
-        password: isModifiedPassword,
+        ...createUserDto,
+        password: hashedPassword,
       };
 
       const newUser = await this.prismaService.user.create({
@@ -39,7 +35,7 @@ export class UserService {
 
       const accessToken = this.jwtService.sign({
         userId: newUser.id,
-        email: user.email,
+        email: newUser.email,
       });
 
       res.cookie('accessToken', accessToken, {
@@ -55,10 +51,10 @@ export class UserService {
         id: newUser.id,
       };
     } catch (error) {
-      if (error.name === 'ZodError') {
-        throw new BadRequestException('Validation failed');
-      }
-      if (error.name === 'PrismaClientKnownRequestError') {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
         throw new ConflictException('User with this email already exists');
       }
       throw new InternalServerErrorException('Failed to create user');
@@ -81,45 +77,41 @@ export class UserService {
 
       const isPasswordCorrect = await compare(password, user.password);
 
-      if (isPasswordCorrect) {
-        const accessToken = this.jwtService.sign({
-          userId: user?.id,
-          email: user?.email,
-        });
-
-        res.cookie('accessToken', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: ONE_HOUR,
-        });
-
-        return { message: 'User logged in successfully' };
-      } else {
+      if (!isPasswordCorrect) {
         throw new UnauthorizedException('Invalid email or password');
       }
+      const accessToken = this.jwtService.sign({
+        userId: user.id,
+        email: user.email,
+      });
+
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: ONE_HOUR,
+      });
+
+      return { message: 'User logged in successfully' };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
-        throw error;
+        throw new NotAuthorizedError();
       }
       throw new InternalServerErrorException('Failed to login');
     }
   }
 
-  logout(res: Response) {
+  logout(res: Response): void {
     res.clearCookie('accessToken', {
       httpOnly: true,
     });
-
-    return { message: 'User logged out successfully' };
   }
 
-  private async passwordModifier(password: string) {
+  private async hashPassword(password: string) {
     try {
       const salt = await genSalt(8);
-      password = await hash(password, salt);
-      return password;
-    } catch (error) {
+      return await hash(password, salt);
+    } catch {
       throw new InternalServerErrorException('Failed to process password');
     }
   }

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, Res, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Res } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, LoginUserDto } from './dto/create-user.dto';
 import type { Response } from 'express';
@@ -13,7 +13,7 @@ export class UserController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.userService.create(createUserDto, res);
+    return this.userService.create(createUserDto, res);
   }
 
   @Post('login')
@@ -22,12 +22,12 @@ export class UserController {
     @Body() loginUserDto: LoginUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.userService.login(loginUserDto, res);
+    return this.userService.login(loginUserDto, res);
   }
 
   @Post('logout')
   @HttpCode(204)
   logOutUser(@Res({ passthrough: true }) res: Response) {
-    return this.userService.logout(res);
+    this.userService.logout(res);
   }
 }
