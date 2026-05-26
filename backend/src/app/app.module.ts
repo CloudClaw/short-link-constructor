@@ -8,8 +8,10 @@ import { ShortLinkModule } from '../short_link/short_link.module';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UserModule } from '../user/user.module';
 import { AuthMiddleware } from '../middlewares/auth';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import 'dotenv/config';
+import CacheMiddleware from '../middlewares/cacheMiddleware';
+import publicCache from '../middlewares/publicCache';
 
 @Module({
   imports: [
@@ -22,16 +24,22 @@ import 'dotenv/config';
     }),
   ],
   controllers: [],
-  providers: [AuthMiddleware],
+  providers: [],
 })
 export class AppModule implements NestModule {
+  constructor(private readonly jwtService: JwtService) {}
+
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware)
+      .apply(AuthMiddleware(this.jwtService))
       .exclude(
         { path: 'user/create', method: RequestMethod.POST },
         { path: 'user/login', method: RequestMethod.POST },
       )
       .forRoutes({ path: '*', method: RequestMethod.ALL });
+
+    consumer
+      .apply(publicCache(), CacheMiddleware(120))
+      .forRoutes({ path: 'short-link/get-all', method: RequestMethod.GET });
   }
 }

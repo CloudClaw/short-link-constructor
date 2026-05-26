@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { IConstructorResponse } from './types';
 import { PrismaService } from '../prisma/prisma.service';
+import { cacheResponse } from '../redis/redis-utils';
 
 @Injectable()
 export class ShortLinkService {
@@ -53,7 +54,6 @@ export class ShortLinkService {
           userId,
         },
       });
-
       return shortLinks.map((link) => ({
         id: link.id,
         originalLink: link.originalLink,

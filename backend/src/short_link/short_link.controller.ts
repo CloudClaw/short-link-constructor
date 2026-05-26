@@ -14,6 +14,7 @@ import { CreateShortLinkDto } from './dto/create-short_link.dto';
 import { UpdateShortLinkDto } from './dto/update-short_link.dto';
 import type { Response } from 'express';
 import { IAuthPayload } from '../user/types';
+import { cacheResponse } from '../redis/redis-utils';
 
 @Controller('short-link')
 export class ShortLinkController {
@@ -36,6 +37,8 @@ export class ShortLinkController {
   @HttpCode(200)
   async getAllShortLinks(@Res({ passthrough: true }) res: Response) {
     const userId = this.getUserIdFromLocals(res);
+    await cacheResponse(res, this.shortLinkService.getAllShortLinks(userId));
+
     return this.shortLinkService.getAllShortLinks(userId);
   }
 
@@ -61,10 +64,7 @@ export class ShortLinkController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const userId = this.getUserIdFromLocals(res);
-    return this.shortLinkService.removeShortLink(
-      userId,
-      id,
-    );
+    return this.shortLinkService.removeShortLink(userId, id);
   }
 
   private getUserIdFromLocals(res: Response) {
